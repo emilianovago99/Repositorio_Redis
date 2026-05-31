@@ -1,4 +1,4 @@
-# Proyecto Final: Clúster Redis de Alta Disponibilidad - Equipo Mecanimales
+# Proyecto Final: Clúster Redis de Alta Disponibilidad - Equipo B
 
 ## Descripción
 
