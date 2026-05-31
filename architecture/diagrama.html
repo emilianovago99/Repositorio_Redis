@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Arquitectura del Clúster - Equipo B</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Animaciones de flujo de datos */
+      .data-flow-down {
+        position: relative;
+        width: 4px;
+        background-color: #e2e8f0;
+        margin: 0 auto;
+        overflow: hidden;
+      }
+      .data-flow-down::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: 0;
+        width: 100%;
+        height: 50%;
+        background: linear-gradient(
+          to bottom,
+          transparent,
+          #3b82f6,
+          transparent
+        );
+        animation: flowDown 1.5s infinite linear;
+      }
+      @keyframes flowDown {
+        0% {
+          top: -50%;
+        }
+        100% {
+          top: 100%;
+        }
+      }
+
+      .data-flow-sync {
+        position: relative;
+        height: 4px;
+        background-color: #e2e8f0;
+        overflow: hidden;
+      }
+      .data-flow-sync::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -50%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(
+          to right,
+          transparent,
+          #10b981,
+          transparent
+        );
+        animation: flowRight 2s infinite linear;
+      }
+      @keyframes flowRight {
+        0% {
+          left: -50%;
+        }
+        100% {
+          left: 100%;
+        }
+      }
+
+      .pulse-ring {
+        animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+      }
+      @keyframes pulse-ring {
+        0% {
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+        }
+        70% {
+          transform: scale(1);
+          box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+        }
+        100% {
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-slate-50 text-slate-800 font-sans min-h-screen p-8">
+    <header class="max-w-7xl mx-auto mb-10 text-center">
+      <h1 class="text-4xl font-extrabold text-slate-900 mb-2">
+        Arquitectura Empresarial Redis HA
+      </h1>
+      <p class="text-xl text-slate-500 font-medium">
+        Equipo B | Despliegue en Oracle Cloud Infrastructure (OCI)
+      </p>
+    </header>
+
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div
+        class="lg:col-span-7 bg-white p-8 rounded-2xl shadow-xl border border-slate-200 flex flex-col items-center"
+      >
+        <h2
+          class="text-xl font-bold text-slate-400 uppercase tracking-widest mb-8 border-b-2 border-slate-100 pb-2 w-full text-center"
+        >
+          Topología de Red
+        </h2>
+
+        <div
+          class="bg-slate-800 text-white px-8 py-3 rounded-lg font-bold shadow-lg z-10 w-64 text-center border-b-4 border-slate-600"
+        >
+          🌐 Clientes / Aplicación Web
+        </div>
+
+        <div class="data-flow-down h-12"></div>
+
+        <div
+          class="w-full max-w-lg border-2 border-dashed border-blue-200 bg-blue-50/50 p-6 rounded-2xl relative"
+        >
+          <div
+            class="absolute -top-3 left-4 bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded uppercase"
+          >
+            Capa de Gestión (mgmt-node)
+          </div>
+          <div class="flex justify-between items-center gap-4">
+            <div
+              class="bg-white border-2 border-blue-400 text-blue-700 px-6 py-4 rounded-xl font-bold shadow-md flex-1 text-center pulse-ring"
+            >
+              ⚖️ HAProxy
+              <div class="text-xs text-blue-500 font-normal mt-1">
+                Puerto 3306 / 6380
+              </div>
+            </div>
+            <div
+              class="bg-white border-2 border-orange-400 text-orange-700 px-6 py-4 rounded-xl font-bold shadow-md flex-1 text-center"
+            >
+              📊 Grafana + Prom
+              <div class="text-xs text-orange-500 font-normal mt-1">
+                Monitoreo (Puerto 3000)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex w-full max-w-lg h-16 relative">
+          <div
+            class="w-1/2 border-r-4 border-b-4 border-slate-200 rounded-br-xl relative"
+          >
+            <div
+              class="absolute right-0 bottom-0 w-full h-1 bg-gradient-to-r from-transparent to-blue-400"
+            ></div>
+          </div>
+          <div
+            class="w-1/2 border-l-4 border-b-4 border-slate-200 rounded-bl-xl"
+          ></div>
+          <div class="absolute left-1/2 top-0 data-flow-down h-16"></div>
+        </div>
+
+        <div
+          class="w-full border-2 border-dashed border-green-200 bg-green-50/30 p-6 rounded-2xl relative mt-4"
+        >
+          <div
+            class="absolute -top-3 left-4 bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded uppercase"
+          >
+            Capa de Datos (Subred Privada)
+          </div>
+
+          <div class="flex justify-center mb-6">
+            <div
+              class="bg-white border-2 border-green-500 text-green-800 px-8 py-4 rounded-xl font-bold shadow-lg w-64 text-center relative hover:scale-105 transition-transform cursor-pointer"
+            >
+              👑 db-node1 (Maestro)
+              <div
+                class="text-xs text-green-600 font-normal mt-1 flex justify-center gap-2"
+              >
+                <span class="bg-green-100 px-2 py-0.5 rounded">R/W</span>
+                <span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded"
+                  >Sentinel</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-center items-center gap-4 mb-2">
+            <div class="data-flow-sync w-24 transform rotate-45"></div>
+            <div class="text-xs font-bold text-slate-400">
+              Replicación Asíncrona
+            </div>
+            <div class="data-flow-sync w-24 transform -rotate-45"></div>
+          </div>
+
+          <div class="flex justify-between gap-4 mt-4">
+            <div
+              class="bg-white border-2 border-slate-300 text-slate-700 px-4 py-4 rounded-xl font-bold shadow-md flex-1 text-center hover:scale-105 transition-transform cursor-pointer"
+            >
+              🛡️ db-node2 (Réplica)
+              <div
+                class="text-xs text-slate-500 font-normal mt-1 flex justify-center gap-2"
+              >
+                <span class="bg-slate-100 px-2 py-0.5 rounded">Read-Only</span>
+                <span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded"
+                  >Sentinel</span
+                >
+              </div>
+            </div>
+            <div
+              class="bg-white border-2 border-slate-300 text-slate-700 px-4 py-4 rounded-xl font-bold shadow-md flex-1 text-center hover:scale-105 transition-transform cursor-pointer"
+            >
+              🛡️ db-node3 (Réplica)
+              <div
+                class="text-xs text-slate-500 font-normal mt-1 flex justify-center gap-2"
+              >
+                <span class="bg-slate-100 px-2 py-0.5 rounded">Read-Only</span>
+                <span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded"
+                  >Sentinel</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="data-flow-down h-12 bg-purple-200"></div>
+
+        <div
+          class="bg-purple-800 text-white px-8 py-4 rounded-xl font-bold shadow-lg z-10 w-full max-w-lg text-center flex items-center justify-center gap-3"
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+            ></path>
+          </svg>
+          OCI Object Storage (Bucket Backups)
+        </div>
+      </div>
+
+      <div class="lg:col-span-5 flex flex-col gap-4">
+        <h2 class="text-xl font-bold text-slate-800 mb-2">
+          Detalle de Roles y Servicios
+        </h2>
+
+        <div
+          class="bg-white p-5 rounded-xl border-l-4 border-blue-500 shadow-sm hover:shadow-md transition-shadow"
+        >
+          <h3 class="font-bold text-blue-800 text-lg flex items-center gap-2">
+            🖥️ Servidor de Gestión (mgmt-node)
+          </h3>
+          <p class="text-sm text-slate-600 mt-2">
+            <strong>IP:</strong> 10.0.0.100
+          </p>
+          <ul
+            class="text-sm text-slate-600 mt-2 space-y-1 list-disc list-inside"
+          >
+            <li>
+              <strong>HAProxy:</strong> Balanceador de carga. Detecta al maestro
+              vivo mediante TCP Health Checks y enruta las escrituras.
+            </li>
+            <li>
+              <strong>Prometheus & Grafana:</strong> Stack de observabilidad en
+              contenedores. Recolecta métricas cada 10s.
+            </li>
+          </ul>
+        </div>
+
+        <div
+          class="bg-white p-5 rounded-xl border-l-4 border-green-500 shadow-sm hover:shadow-md transition-shadow"
+        >
+          <h3 class="font-bold text-green-800 text-lg flex items-center gap-2">
+            👑 Nodo Primario (db-node1)
+          </h3>
+          <p class="text-sm text-slate-600 mt-2">
+            <strong>IP:</strong> 10.0.0.129
+          </p>
+          <ul
+            class="text-sm text-slate-600 mt-2 space-y-1 list-disc list-inside"
+          >
+            <li>
+              <strong>Redis-Server:</strong> Rol Master. Procesa el 100% de las
+              escrituras.
+            </li>
+            <li>
+              <strong>Redis-Sentinel:</strong> Actúa como árbitro (1 de 3 votos)
+              para vigilar la salud del clúster.
+            </li>
+            <li>
+              <strong>Cron Jobs:</strong> Ejecuta los scripts automatizados de
+              respaldos (PITR) y mantenimiento nocturno.
+            </li>
+          </ul>
+        </div>
+
+        <div
+          class="bg-white p-5 rounded-xl border-l-4 border-slate-500 shadow-sm hover:shadow-md transition-shadow"
+        >
+          <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+            🛡️ Nodos Secundarios (db-node2/3)
+          </h3>
+          <p class="text-sm text-slate-600 mt-2">
+            <strong>IPs:</strong> 10.0.0.204 / 10.0.0.248
+          </p>
+          <ul
+            class="text-sm text-slate-600 mt-2 space-y-1 list-disc list-inside"
+          >
+            <li>
+              <strong>Redis-Server:</strong> Rol Réplica (Read-Only). Mantiene
+              una copia exacta asíncrona de los datos.
+            </li>
+            <li>
+              <strong>Redis-Sentinel:</strong> Proveen los votos necesarios
+              (Quórum) para realizar un failover automático.
+            </li>
+            <li>
+              <strong>Redis_Exporter:</strong> Expone las métricas del nodo para
+              Grafana.
+            </li>
+          </ul>
+        </div>
+
+        <div
+          class="bg-white p-5 rounded-xl border-l-4 border-purple-500 shadow-sm hover:shadow-md transition-shadow"
+        >
+          <h3 class="font-bold text-purple-800 text-lg flex items-center gap-2">
+            📦 OCI Object Storage
+          </h3>
+          <ul
+            class="text-sm text-slate-600 mt-2 space-y-1 list-disc list-inside"
+          >
+            <li><strong>Bucket:</strong> `redis-backups`</li>
+            <li>
+              Almacenamiento seguro fuera de la instancia. Guarda archivos RDB y
+              AOF comprimidos para recuperación ante desastres (DRP).
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
